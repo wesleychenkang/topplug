@@ -20,11 +20,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.top.sdk.entity.PopData;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.plugservice.ClickCallBack;
 import com.top.sdk.resuorces.ResourceLoader;
 import com.top.sdk.utils.FileUtil;
 import com.top.sdk.utils.ImageLoader;
-import com.top.sdk.utils.LogUtil;
 import com.top.sdk.utils.MetricUtil;
 
 public class PopView extends FrameLayout implements OnClickListener {

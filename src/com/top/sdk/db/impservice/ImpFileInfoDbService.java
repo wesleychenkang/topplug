@@ -12,7 +12,7 @@ import com.top.sdk.db.DBConstant;
 import com.top.sdk.db.DBHelper;
 import com.top.sdk.db.service.FileInfoDbService;
 import com.top.sdk.entity.FileInfo;
-import com.top.sdk.utils.LogUtil;
+import com.top.sdk.log.LogUtil;
 
 public class ImpFileInfoDbService implements FileInfoDbService {
 	private DBHelper openHelper;

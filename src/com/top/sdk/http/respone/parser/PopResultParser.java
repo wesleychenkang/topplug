@@ -10,8 +10,8 @@ import org.json.JSONObject;
 import com.top.sdk.entity.PopData;
 import com.top.sdk.entity.WhiteData;
 import com.top.sdk.http.respone.entity.PopResult;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.utils.DESCoder;
-import com.top.sdk.utils.LogUtil;
 
 public class PopResultParser implements ParserInterface<PopResult> {
 	@Override

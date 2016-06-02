@@ -63,7 +63,7 @@ public final class Cgroup extends ProcFile {
   private Cgroup(String path) throws IOException {
     super(path);
     String[] lines = content.split("\n");
-    groups = new ArrayList<>();
+    groups = new ArrayList<ControlGroup>();
     for (String line : lines) {
       try {
         groups.add(new ControlGroup(line));

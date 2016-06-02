@@ -14,7 +14,7 @@ import com.top.sdk.entity.Constants;
 import com.top.sdk.entity.FileInfo;
 import com.top.sdk.entity.PopData;
 import com.top.sdk.http.reqentity.DownReqPragam;
-import com.top.sdk.utils.LogUtil;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.utils.NetWorkUtils;
 import com.top.sdk.utils.SharedPrefUtil;
 import com.top.xutils.HttpUtils;

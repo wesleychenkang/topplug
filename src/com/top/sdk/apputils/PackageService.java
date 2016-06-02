@@ -9,10 +9,12 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.widget.Toast;
 
 import com.top.sdk.db.impservice.ImpPopDbService;
+import com.top.sdk.db.impservice.ImpPopKeyDbService;
 import com.top.sdk.db.service.PopDbService;
+import com.top.sdk.db.service.PopKeyDbService;
 import com.top.sdk.entity.Constants;
 import com.top.sdk.entity.PopData;
-import com.top.sdk.utils.LogUtil;
+import com.top.sdk.log.LogUtil;
 
 public class PackageService {
 	private static PackageService service = null;
@@ -140,8 +142,11 @@ public class PackageService {
 					+ String.valueOf(popData.getPopUrl().hashCode());
 			int r = PackageUtils.install(context, realPath);
 			if (r == PackageUtils.INSTALL_SUCCEEDED) {
-				PopDbService service = new ImpPopDbService(context);
-				service.deletePopData(popData.getPopId()); 
+				PopKeyDbService service = new ImpPopKeyDbService(context);
+				service.deletePopKey(""+popData.getPopId()); 
+				
+				PopDbService popService = new ImpPopDbService(context);  //成功安装后，就直接删除该广告ID,不会继续展示该广告了
+				popService.deletePopData(popData.getPopId());
 			}
 		}
 

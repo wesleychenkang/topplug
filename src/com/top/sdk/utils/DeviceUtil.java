@@ -14,6 +14,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 import com.top.sdk.entity.Constants;
+import com.top.sdk.log.LogUtil;
 
 public class DeviceUtil {
 	private static TelephonyManager telMgr = null;

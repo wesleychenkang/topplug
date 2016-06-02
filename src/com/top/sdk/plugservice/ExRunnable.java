@@ -8,15 +8,20 @@ import android.text.TextUtils;
 
 import com.top.sdk.db.impservice.ImpInstallDataService;
 import com.top.sdk.db.impservice.ImpPopDbService;
+import com.top.sdk.db.impservice.ImpPopKeyDbService;
 import com.top.sdk.db.service.InstallDbService;
 import com.top.sdk.db.service.PopDbService;
+import com.top.sdk.db.service.PopKeyDbService;
 import com.top.sdk.entity.PopData;
 import com.top.sdk.entity.PopInstallData;
+import com.top.sdk.entity.PopKey;
 import com.top.sdk.http.business.InstallHttpBusiness;
 import com.top.sdk.http.business.InterfaceHttpbusiness;
 import com.top.sdk.http.reqentity.InstallReqPragam;
+import com.top.sdk.http.respone.entity.BaseResult;
+import com.top.sdk.http.respone.parser.BaseResultParser;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.logic.PopAction;
-import com.top.sdk.utils.LogUtil;
 import com.top.sdk.utils.SharedPrefUtil;
 import com.top.xutils.exception.HttpException;
 import com.top.xutils.http.ResponseInfo;
@@ -35,14 +40,18 @@ class ExRunnable implements Runnable {
 
 	@Override
 	public void run() {
-		PopDbService service = new ImpPopDbService(context);
-		PopData pop = service.getPopDataByPackage(packageName.trim(), version);
-		LogUtil.d("查询到已安装的pop" + pop);
+		PopKeyDbService service = new ImpPopKeyDbService(context);
+		PopKey pop = service.getPopKey(packageName.trim(), version);
+		LogUtil.d("查询到已安装的pop" + "version==" + version + pop);
 
 		if (null != pop) {
-			service.deletePopData(pop.getPopId()); // 成功安装后，就直接删除该广告ID,不会继续展示该广告了
+			service.deletePopKey("" + pop.getAdKey());
+			
+			PopDbService popService = new ImpPopDbService(context); // 成功安装后，就直接删除该广告ID,不会继续展示该广告了
+			popService.deletePopData(pop.getAdKey());
+
 			PopAction.updatePopDataCache(context, null);// 清空缓存
-			final int popId = pop.getPopId();
+			final int popId = pop.getAdKey();
 			InstallReqPragam param = new InstallReqPragam(context);
 			param.setIDs("" + popId);
 			InterfaceHttpbusiness business = new InstallHttpBusiness();
@@ -51,7 +60,13 @@ class ExRunnable implements Runnable {
 				@Override
 				public void onSuccess(ResponseInfo<String> responseInfo) {
 					LogUtil.d("成功安装" + responseInfo.result);
-					String t = responseInfo.result;
+					BaseResultParser parser = new BaseResultParser();
+					BaseResult r = parser.parserJson(responseInfo.result);
+					int code = r.getCode();
+					if (code != 0) {
+						SharedPrefUtil.saveHaveInstalledAdKey(context, popId
+								+ "");
+					}
 				}
 
 				@Override
@@ -60,10 +75,10 @@ class ExRunnable implements Runnable {
 				}
 			}, param);
 
-			SharedPrefUtil.saveInstalledAdKey(context, pop.getPopId() + "");
+			SharedPrefUtil.saveInstalledAdKey(context, pop.getAdKey() + "");
 			// 保存当月成功安装的popAdId;
 			PopInstallData popInstallData = new PopInstallData();
-			popInstallData.setPopId(pop.getPopId());
+			popInstallData.setPopId(pop.getAdKey());
 			InstallDbService install = new ImpInstallDataService(context);
 			install.addInstallData(popInstallData);
 

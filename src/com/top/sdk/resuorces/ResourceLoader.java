@@ -6,7 +6,7 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
-import com.top.sdk.utils.LogUtil;
+import com.top.sdk.log.LogUtil;
 
 public class ResourceLoader {
 	

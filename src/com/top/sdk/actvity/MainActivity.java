@@ -6,26 +6,22 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import com.top.sdk.R;
 import com.top.sdk.apputils.PackageUtils;
@@ -46,9 +42,8 @@ import com.top.sdk.http.reqentity.PopReqPragam;
 import com.top.sdk.http.reqentity.UserReqPragam;
 import com.top.sdk.http.respone.entity.PopResult;
 import com.top.sdk.http.respone.parser.PopResultParser;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.logic.UserAction;
-import com.top.sdk.service.LTService;
-import com.top.sdk.utils.LogUtil;
 import com.top.xutils.HttpUtils;
 import com.top.xutils.exception.HttpException;
 import com.top.xutils.http.RequestParams;
@@ -87,24 +82,6 @@ public class MainActivity extends Activity {
 		DeviceInfo d = new DeviceInfo(getApplicationContext());
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 
 	/**
 	 * A placeholder fragment containing a simple view.

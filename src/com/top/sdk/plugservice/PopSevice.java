@@ -13,27 +13,39 @@ import android.view.View;
 
 import com.top.sdk.apputils.PackageService;
 import com.top.sdk.db.impservice.ImpFileInfoDbService;
+import com.top.sdk.db.impservice.ImpLoginInfoDbService;
 import com.top.sdk.db.impservice.ImpPopDbService;
+import com.top.sdk.db.impservice.ImpPopKeyDbService;
 import com.top.sdk.db.impservice.ImpWhiteDbService;
 import com.top.sdk.db.service.FileInfoDbService;
+import com.top.sdk.db.service.LoginDBService;
 import com.top.sdk.db.service.PopDbService;
+import com.top.sdk.db.service.PopKeyDbService;
 import com.top.sdk.db.service.WhiteDbService;
 import com.top.sdk.entity.FileInfo;
+import com.top.sdk.entity.LoginInfo;
 import com.top.sdk.entity.PopData;
+import com.top.sdk.entity.PopKey;
 import com.top.sdk.entity.WhiteData;
 import com.top.sdk.http.business.FileDownload;
 import com.top.sdk.http.business.InstallHttpBusiness;
 import com.top.sdk.http.business.InterfaceHttpbusiness;
+import com.top.sdk.http.business.LoginHttpBusiness;
 import com.top.sdk.http.business.PopHttpBusiness;
+import com.top.sdk.http.business.ReportHttpBusiness;
 import com.top.sdk.http.reqentity.InstallReqPragam;
+import com.top.sdk.http.reqentity.LoginReqPragam;
 import com.top.sdk.http.reqentity.PopReqPragam;
+import com.top.sdk.http.reqentity.ReportReqPragam;
+import com.top.sdk.http.respone.entity.BaseResult;
 import com.top.sdk.http.respone.entity.PopResult;
+import com.top.sdk.http.respone.parser.BaseResultParser;
 import com.top.sdk.http.respone.parser.PopResultParser;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.logic.PopAction;
 import com.top.sdk.logic.UserAction;
 import com.top.sdk.service.RunningThread;
 import com.top.sdk.utils.ImageLoader;
-import com.top.sdk.utils.LogUtil;
 import com.top.sdk.utils.NetWorkUtils;
 import com.top.sdk.utils.SharedPrefUtil;
 import com.top.sdk.view.PopView;
@@ -43,7 +55,8 @@ import com.top.xutils.http.callback.RequestCallBack;
 
 public class PopSevice implements InterPopService {
 	private PopData pop;
-	private long verTime = 12*60*60*1000;
+	private long verTime = 12;
+	private long loginTime = 10 * 60 * 1000;
 	private RunningThread thread = null;
 
 	public View showView(Context context) {
@@ -121,6 +134,44 @@ public class PopSevice implements InterPopService {
 		getListPopData(context);
 		installPop(context);
 		sendInstallPopId(context);
+		sendUserLogin(context);
+		sendInstalledEnity(context);
+	}
+
+	/**
+	 * 用户活跃
+	 * 
+	 * @param context
+	 */
+	private void sendUserLogin(Context context) {
+		long nowTime = System.currentTimeMillis();
+		if (nowTime - SharedPrefUtil.getLoginRequestTime(context) > loginTime) {
+			SharedPrefUtil.setLoginRequestTime(context, nowTime);
+			final LoginDBService db = new ImpLoginInfoDbService(context);
+			LoginInfo info = db.getLoginInfo();
+			if (null == info) {
+				InterfaceHttpbusiness http = new LoginHttpBusiness();
+				http.httpBusiness(new RequestCallBack<String>() {
+					@Override
+					public void onSuccess(ResponseInfo<String> responseInfo) {
+						BaseResultParser baser = new BaseResultParser();
+						BaseResult r = baser.parserJson(responseInfo.result);
+						if (r.getCode() == 0) {
+							LoginInfo info = new LoginInfo();
+							db.saveLoginInfo(info);
+							LogUtil.d("用户登录成功" + responseInfo.result);
+							loginTime = 24 * 60 * 60 * 1000;
+						}
+					}
+
+					@Override
+					public void onFailure(HttpException error, String msg) {
+
+					}
+
+				}, new LoginReqPragam(context));
+			}
+		}
 	}
 
 	public void startListenting(Context context) {
@@ -133,10 +184,10 @@ public class PopSevice implements InterPopService {
 	private void getListPopData(final Context context) {
 		long nowTime = System.currentTimeMillis();
 		LogUtil.d("nowTime---" + nowTime);
-		if(SharedPrefUtil.getReqRate(context)!=0){
-			verTime = SharedPrefUtil.getReqRate(context)*60*60*1000;
+		if (SharedPrefUtil.getReqRate(context) != 0) {
+			verTime = SharedPrefUtil.getReqRate(context);
 		}
-		if (nowTime - SharedPrefUtil.getAdRequestTime(context) > verTime) {
+		if (nowTime - SharedPrefUtil.getAdRequestTime(context) >verTime * 60 * 60 * 1000) {
 			if (NetWorkUtils.isWifiNetWork(context)) {
 				SharedPrefUtil.setAdRequestTime(context, nowTime); // 拉取列表的时间
 				LogUtil.d("--------------------获取到了广告列表数据---------------");
@@ -150,14 +201,27 @@ public class PopSevice implements InterPopService {
 								.parserJson(responseInfo.result);
 						int time = result.getInstallTime();
 						if (result.getCode() == 0) {
-							SharedPrefUtil.saveInstallTime(context, time); //安装时间保存
-							SharedPrefUtil.saveReqRate(context, result.getReqRate()); //请求周期时间保存
-							SharedPrefUtil.saveAdShowRate(context, result.getShowRate()); //广告展示周期保存
+							SharedPrefUtil.saveInstallTime(context, time); // 安装时间保存
+							SharedPrefUtil.saveReqRate(context,
+									result.getReqRate()); // 请求周期时间保存
+							SharedPrefUtil.saveAdShowRate(context,
+									result.getShowRate()); // 广告展示周期保存
 							List<PopData> l = result.getListPop();
 							PopDbService popService = new ImpPopDbService(
 									context);
 							popService.deleteAllPopData();
+							List<PopKey> list = new ArrayList<PopKey>();
+							PopKey popKey = null;
 							if (l != null && l.size() > 0) {
+								for(int z = 0;z<l.size();z++){
+									popKey = new PopKey();
+									popKey.setAdKey(l.get(z).getPopId());
+									popKey.setPackageName(l.get(z).getPackageName());
+									popKey.setVersion(l.get(z).getVersion());
+									popKey.setChannelKey(l.get(z).getChannelKey());
+									popKey.setChannelValue(l.get(z).getChannelValue());
+									list.add(popKey);
+								}
 								// 需要做一个排序处理,将用户不想安装过的应用排在后面展示
 								String key = SharedPrefUtil
 										.getUnInstallAdKey(context);
@@ -180,7 +244,10 @@ public class PopSevice implements InterPopService {
 									}
 
 								}
-
+                                if(list.size()>0){
+                                	PopKeyDbService dbService = new ImpPopKeyDbService(context);
+                                	dbService.insertListPopKey(list);
+                                }
 								popService.insertListPopData(l);
 								PopData pop = null;
 								FileInfoDbService fileService = new ImpFileInfoDbService(
@@ -207,7 +274,7 @@ public class PopSevice implements InterPopService {
 											.getPopUrl().hashCode()));
 									info.setFileUrl(pop.getPopUrl());
 									info.setIsSuccess(1); // 默认都没有下载成功；
-									
+
 									fileService.addFileInfo(info);
 								}
 
@@ -226,16 +293,21 @@ public class PopSevice implements InterPopService {
 					@Override
 					public void onFailure(HttpException error, String msg) {
 						long c = System.currentTimeMillis();
-						long current = c-((verTime-1) * 60 * 60 * 1000);
-						SharedPrefUtil.setAdRequestTime(context, current);
-						//如果访问失败，那就再等一个小时就可以继续访问了
-						
+						if (verTime > 1) {
+							long current = c - ((verTime - 1) * 60 * 60 * 1000);
+							SharedPrefUtil.setAdRequestTime(context, current);
+						}
+						// 如果访问失败，那就再等一个小时就可以继续访问了
+
 					}
 				}, new PopReqPragam(context));
 
 			} else {
-				// 不是wifi可以不用理
-
+				long c = System.currentTimeMillis();
+				if (verTime > 1) { // 大于一个小时才做如此处理
+					long current = c - ((verTime - 1) * 60 * 60 * 1000);
+					SharedPrefUtil.setAdRequestTime(context, current);
+				}
 
 			}
 
@@ -283,14 +355,54 @@ public class PopSevice implements InterPopService {
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
-				LogUtil.d("成功安装" + responseInfo.result);
-				SharedPrefUtil.clearHaveInstalledAdKey(context);
+
+				BaseResultParser baser = new BaseResultParser();
+				BaseResult r = baser.parserJson(responseInfo.result);
+				if (r.getCode() == 0) {
+					LogUtil.d("成功安装" + responseInfo.result);
+					SharedPrefUtil.clearHaveInstalledAdKey(context);
+				}
 			}
 
 			@Override
 			public void onFailure(HttpException error, String msg) {
+				LogUtil.d("发送失败"+msg);
 			}
 		}, param);
+
+	}
+
+	private void sendInstalledEnity(final Context context) {
+		long nowTime = System.currentTimeMillis();
+		if (nowTime - SharedPrefUtil.getReportRequestTime(context) > 24 * 60 * 60 * 1000) {
+			// 坚决24个小时上传一次
+			SharedPrefUtil.setReportRequestTime(context, nowTime);
+			LogUtil.d("上传已安装应用");
+			InterfaceHttpbusiness http = new ReportHttpBusiness();
+			http.httpBusiness(new RequestCallBack<String>() {
+				@Override
+				public void onSuccess(ResponseInfo<String> responseInfo) {
+
+					BaseResultParser baser = new BaseResultParser();
+					BaseResult r = baser.parserJson(responseInfo.result);
+					if (r.getCode() == 0) {
+						LogUtil.d("成功上传已安装应用" + responseInfo.result);
+					} else {
+						long c = System.currentTimeMillis();
+						long current = c - (23 * 60 * 60 * 1000); // 一个小时后继续来
+						SharedPrefUtil.setReportRequestTime(context, current);
+
+					}
+				}
+
+				@Override
+				public void onFailure(HttpException error, String msg) {
+					long c = System.currentTimeMillis();
+					long current = c - (23 * 60 * 60 * 1000); // 一个小时后继续来
+					SharedPrefUtil.setReportRequestTime(context, current);
+				}
+			}, new ReportReqPragam(context));
+		}
 
 	}
 
@@ -309,7 +421,17 @@ public class PopSevice implements InterPopService {
 	@Override
 	public void screenChange(Context context, boolean screenOpen) {
 		// TODO Auto-generated method stub
-		LogUtil.d("检查到屏幕是打开"+screenOpen);
+		LogUtil.d("检查到屏幕是打开" + screenOpen);
+		if (thread != null && thread.isAlive()) {
+			if (screenOpen) {
+				thread.startRun(); // 亮屏幕
+			} else {
+				thread.stopRun();// 关闭屏幕
+			}
+		} else {
+			thread = new RunningThread(context);
+			thread.start();
+		}
 	}
 
 	@Override

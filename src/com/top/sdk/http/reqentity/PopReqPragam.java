@@ -13,8 +13,8 @@ import android.util.Log;
 
 import com.top.sdk.db.impservice.ImpInstallDataService;
 import com.top.sdk.db.service.InstallDbService;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.utils.DESCoder;
-import com.top.sdk.utils.LogUtil;
 import com.top.sdk.utils.SharedPrefUtil;
 
 public class PopReqPragam extends BaseReqPragam {

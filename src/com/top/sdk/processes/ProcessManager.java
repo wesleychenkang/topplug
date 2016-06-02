@@ -99,7 +99,7 @@ public class ProcessManager {
    * @return a list of <i>all</i> processes running on the device.
    */
   public static List<AndroidProcess> getRunningProcesses() {
-    List<AndroidProcess> processes = new ArrayList<>();
+    List<AndroidProcess> processes = new ArrayList<AndroidProcess>();
     File[] files = new File("/proc").listFiles();
     for (File file : files) {
       if (file.isDirectory()) {
@@ -125,7 +125,7 @@ public class ProcessManager {
    * @return a list of all running app processes on the device.
    */
   public static List<AndroidAppProcess> getRunningAppProcesses() {
-    List<AndroidAppProcess> processes = new ArrayList<>();
+    List<AndroidAppProcess> processes = new ArrayList<AndroidAppProcess>();
     File[] files = new File("/proc").listFiles();
     for (File file : files) {
       if (file.isDirectory()) {
@@ -156,7 +156,7 @@ public class ProcessManager {
    * @return a list of user apps that are in the foreground.
    */
   public static List<AndroidAppProcess> getRunningForegroundApps(Context ctx) {
-    List<AndroidAppProcess> processes = new ArrayList<>();
+    List<AndroidAppProcess> processes = new ArrayList<AndroidAppProcess>();
     File[] files = new File("/proc").listFiles();
     PackageManager pm = ctx.getPackageManager();
     for (File file : files) {
@@ -225,7 +225,7 @@ public class ProcessManager {
   public static List<RunningAppProcessInfo> getRunningAppProcessInfo(Context ctx) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       List<AndroidAppProcess> runningAppProcesses = ProcessManager.getRunningAppProcesses();
-      List<RunningAppProcessInfo> appProcessInfos = new ArrayList<>();
+      List<RunningAppProcessInfo> appProcessInfos = new ArrayList<RunningAppProcessInfo>();
       for (AndroidAppProcess process : runningAppProcesses) {
         RunningAppProcessInfo info = new RunningAppProcessInfo(process.name, process.pid, null);
         info.uid = process.uid;

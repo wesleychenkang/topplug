@@ -1,7 +1,7 @@
 package com.top.sdk.entity;
 
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.utils.DeviceUtil;
-import com.top.sdk.utils.LogUtil;
 
 import android.content.Context;
 import android.os.Build;
@@ -35,14 +35,14 @@ public class DeviceInfo {
 	}
 
 	public String getImsi() {
-		return imsi;
-	}
-
-	public void setImsi(String imsi) {
 		imsi = tm.getSubscriberId();
 		if(TextUtils.isEmpty(imsi)){
 			imsi = "";
 		}
+		return imsi;
+	}
+
+	public void setImsi(String imsi) {
 		this.imsi = imsi;
 	}
 

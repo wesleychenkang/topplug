@@ -12,6 +12,7 @@ import com.top.sdk.db.DBConstant;
 import com.top.sdk.db.DBHelper;
 import com.top.sdk.db.service.PopDbService;
 import com.top.sdk.entity.PopData;
+import com.top.sdk.log.LogUtil;
 
 public class ImpPopDbService implements PopDbService {
 	private DBHelper openHelper;
@@ -129,7 +130,7 @@ public class ImpPopDbService implements PopDbService {
 
 	@Override
 	public boolean deletePopData(int popId) {
-		int count = dataBase.delete(DBConstant.TABLE_NAME_POPDATA, "popId=?",
+		int count = dataBase.delete(DBConstant.TABLE_NAME_POPDATA, "popId=? ",
 				new String[] { "" + popId });
 		if (count > 0) {
 			return true;
@@ -336,7 +337,7 @@ public class ImpPopDbService implements PopDbService {
 		PopData data = null;
 		try {
 			cursor = dataBase.query(DBConstant.TABLE_NAME_POPDATA, null,
-					"packageName = ? and version = ?", new String[] { packageName,version }, null,
+					"packageName = ? and version = ?", new String[] { packageName,version}, null,
 					null, null);
 			if (cursor != null && cursor.moveToFirst()) {
 				data = new PopData();

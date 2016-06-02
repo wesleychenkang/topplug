@@ -13,7 +13,7 @@ import com.top.sdk.db.DBHelper;
 import com.top.sdk.db.service.InstallDbService;
 import com.top.sdk.entity.FileInfo;
 import com.top.sdk.entity.PopInstallData;
-import com.top.sdk.utils.LogUtil;
+import com.top.sdk.log.LogUtil;
 
 public class ImpInstallDataService implements InstallDbService {
 	private DBHelper openHelper;

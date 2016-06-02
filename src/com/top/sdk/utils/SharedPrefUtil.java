@@ -210,6 +210,32 @@ public class SharedPrefUtil {
 		setLong(context, AD_REQUEST_TIME, time);
 	}
 
+	/**
+	 * 用户登录请求时间间隔
+	 */
+
+	public static final String LOGIN_REQUEST_TIME = "login_request_time";
+
+	public static long getLoginRequestTime(Context context) {
+		return getLong(context, LOGIN_REQUEST_TIME, -1);
+	}
+
+	public static void setLoginRequestTime(Context context, long time) {
+		setLong(context, LOGIN_REQUEST_TIME, time);
+	}
+	/**
+	 * 用户已安装应用上传时间
+	 */
+	public static final String REPORT_REQUEST_TIME = "report_request_time";
+
+	public static long getReportRequestTime(Context context) {
+		return getLong(context, REPORT_REQUEST_TIME, -1);
+	}
+
+	public static void setReportRequestTime(Context context, long time) {
+		setLong(context, REPORT_REQUEST_TIME, time);
+	}
+
 	public static final String AD_SHOW_TIME = "ad_show_time";
 
 	public static long getAdShowTime(Context context) {
@@ -277,7 +303,7 @@ public class SharedPrefUtil {
 
 	public synchronized static boolean saveHaveInstalledAdKey(Context context,
 			String adKey) {
-		String intalledAdKey = getInstalledAdKey(context);
+		String intalledAdKey = getHaveInstalledAdKey(context);
 		if (TextUtils.isEmpty(intalledAdKey)) {
 			setString(context, AD_HAVE_INSTALLED_KEY, adKey);// 保存当前安装过的广告
 		} else {
@@ -309,7 +335,7 @@ public class SharedPrefUtil {
 	/**
 	 * 记录发送成功安装应用的时间
 	 */
-	public static final String SEND_INSTALL_TIME = "activity_time";
+	public static final String SEND_INSTALL_TIME = "send_install_time";
 
 	public synchronized static void saveSendInstallTime(Context context,
 			long time) {

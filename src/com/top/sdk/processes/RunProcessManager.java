@@ -6,7 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.top.sdk.utils.LogUtil;
+import com.top.sdk.log.LogUtil;
 
 import android.util.Log;
 

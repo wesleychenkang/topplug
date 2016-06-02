@@ -21,11 +21,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
+import com.top.sdk.actvity.LTService;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.logic.UserAction;
 import com.top.sdk.plugin.DownLoadDex;
-import com.top.sdk.service.LTService;
 import com.top.sdk.utils.DESCoder;
-import com.top.sdk.utils.LogUtil;
 import com.top.sdk.utils.SharedPrefUtil;
 
 public class App extends Application {

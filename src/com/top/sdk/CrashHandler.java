@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.TreeSet;
 
-import com.top.sdk.utils.LogUtil;
+import com.top.sdk.log.LogUtil;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

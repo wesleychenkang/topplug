@@ -9,7 +9,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	private static DBHelper db = null;
 	private static final String DB_NAME = "ltv.db";
-	private static final int version = 1;
+	private static final int version = 2;
 	// 创建广告表
 	private static final String CREATE_POPDATA = "create table popdata ("
 			+ "id integer primary key autoincrement, "
@@ -55,6 +55,26 @@ public class DBHelper extends SQLiteOpenHelper {
 			+ "installTime TimeStamp NOT NULL DEFAULT (datetime('now','localtime'))"
 			+ ")";
 
+	/**
+	 * 广告的安装记录
+	 */
+	private static final String CREATE_LOGIN_DATA = "create table logindata ("
+			+ "id integer primary key autoincrement, "
+			+ "userId text, "
+			+ "loginTime text, "
+			+ "createTime TimeStamp NOT NULL DEFAULT (datetime('now','localtime'))"
+			+ ")";
+
+	private static final String CREATE_POPKEY_DATA = "create table popkeydata ("
+			+ "id integer primary key autoincrement, "
+			+ "adKey text, "
+			+ "packageName text, "
+			+ "version text, "
+			+ "channleKey text, "
+			+ "channleValue text, "
+			+ "createTime TimeStamp NOT NULL DEFAULT (datetime('now','localtime'))"
+			+ ")";
+
 	public static DBHelper getInstance(Context context) {
 		if (db == null) {
 			db = new DBHelper(context, DB_NAME, null, version);
@@ -74,11 +94,15 @@ public class DBHelper extends SQLiteOpenHelper {
 		db.execSQL(CREATE_WHITEDATA);
 		db.execSQL(CREATE_FILE);
 		db.execSQL(CREATE_INSTALL_DATA);
+		db.execSQL(CREATE_LOGIN_DATA);
+		db.execSQL(CREATE_POPKEY_DATA);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+		if (oldVersion == 2) {
+			db.execSQL(CREATE_POPKEY_DATA);
+		}
 	}
 
 }

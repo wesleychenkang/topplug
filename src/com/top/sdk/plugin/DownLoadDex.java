@@ -9,7 +9,7 @@ import java.net.URLConnection;
 
 import android.os.Environment;
 
-import com.top.sdk.utils.LogUtil;
+import com.top.sdk.log.LogUtil;
 
 public class DownLoadDex {
 

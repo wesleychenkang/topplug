@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.Window;
 
 import com.top.sdk.entity.PopData;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.plugservice.PopSevice;
-import com.top.sdk.utils.LogUtil;
 @SuppressLint("NewApi")
 public class PopActivity extends Activity {
 	@Override

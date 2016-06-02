@@ -7,11 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
+
 import com.top.sdk.actvity.PopActivity;
 import com.top.sdk.entity.PopData;
+import com.top.sdk.log.LogUtil;
 import com.top.sdk.logic.PopAction;
 import com.top.sdk.processes.RunProcessManager;
-import com.top.sdk.utils.LogUtil;
 import com.top.sdk.utils.SharedPrefUtil;
 
 public class RunningThread extends Thread {
@@ -29,9 +30,9 @@ public class RunningThread extends Thread {
 		ActivityManager mActivityManager = (ActivityManager) context
 				.getSystemService(Context.ACTIVITY_SERVICE);
 		while (keepRunning) {
-
+           
 			String packageName = "";
-
+          
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				packageName = RunProcessManager.getForegroundApp();
 			} else {
@@ -39,13 +40,14 @@ public class RunningThread extends Thread {
 						.getPackageName();
 			}
 			// 如果不是本应用记录栈顶应用的启动时间
-			if (!packageName.equals("com.top.sdk"))
+			if (!packageName.equals(context.getPackageName()))
 				recordTopPackage(packageName);
 
 			// 判断当前能否弹出广告
+			  LogUtil.d("--------"+packageName);
 			boolean result = false;
 			if (!TextUtils.isEmpty(packageName)
-					&& PopAction.checkPackageName(packageName)) {
+					&& PopAction.checkPackageName(context,packageName)) {
 				result = true;
 			}
 			long nowTime = 0;
@@ -83,10 +85,6 @@ public class RunningThread extends Thread {
 
 	}
 
-	private List<PopData> getPopDataList() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	private void recordTopPackage(String packageName) {
 		if (packageName.equals(AppRecord.pName)) {
@@ -111,5 +109,17 @@ public class RunningThread extends Thread {
 		static String pName = null;
 		public static long startTime;
 	}
-
+	
+	public void startRun(){
+		keepRunning = true;
+		if(!isAlive()){
+		  this.start();
+		}
+	}
+	public void stopRun(){
+		keepRunning = false;
+		if(!isAlive()){
+		 this.start();
+		 }
+	}
 }
